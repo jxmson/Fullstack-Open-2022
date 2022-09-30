@@ -1,0 +1,10 @@
+title SPA POST
+
+note over browser:
+browser sends new_note_spa as JSON data  
+end note
+browser->server: HTTP POST https://studies.cs.helsinki.fi/exampleapp/new_note_spa
+note over server:
+server returns success message 
+end note
+server-->browser: 201 Status code
