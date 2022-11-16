@@ -1,41 +1,10 @@
 import { useState, useEffect } from 'react'
+
 import personService from './services/persons'
-
-const Persons = ({person, remove, updateNumber}) => (
-  <li>
-    {person.name} {person.number}
-    <Button handleClick={remove}
-     text="Delete"></Button>
- </li>
-)
-
-const Button = (props) => (
-  <button onClick = {props.handleClick}>
-        {props.text}
-      </button>
-)
-
-const Filter = (props) => {
-  return(
-    <div>
-      filter shown with <input value={props.search} onChange={props.handleSearch} />      
-    </div>
-  )
-}
-
-const PersonForm = (props) => {
-return(
-  <form onSubmit= {props.addPerson}
-            >
-        <div>
-          name: <input value={props.newName} onChange= {props.handleNewName}/> <br />
-          number: <input value={props.newNumber} onChange= {props.handleNewNumber}/>
-        </div>
-        <div>
-          <button type="submit">add</button>
-        </div>
-    </form>
-)}
+import Persons from './Components/Persons'
+import PersonForm from './Components/PersonForm'
+import Button from "./Components/Button"
+import Notification from './Components/Notification'
 
 const App = () => {
 
@@ -43,6 +12,8 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [search, setSearch] = useState('')
+  const [notification, setNotification] = useState('')
+  const [notifColor, setNotifColor] = useState('')
 
   const personToShow = search === '' ? persons : persons.filter(person => person.name.toLowerCase().includes(search.toLowerCase()))
 
@@ -68,30 +39,57 @@ const App = () => {
 
       const changedNumber = {...person, number: newNumber}
 
-      if (window.confirm(`Please be aware that the ${newName}'s number will be update to ${newNumber} because this already exists in the phonebook.`)) 
-      personService.update(person.id, changedNumber)
+      if (window.confirm(`Please be aware that the ${newName}'s number will be update to ${newNumber} because this name already exists in the phonebook.`)) 
+      {
+        personService.update(person.id, changedNumber)
       .then(returnedPerson => {
         setPersons(persons.map(p => 
           p.id !== person.id 
           ? p 
           : returnedPerson           
         ))
+
+        setNotifColor('success')
+        setNotification(`Changed ${person.name}'s number to ${newNumber}`)
+
+        setTimeout(() => {        
+          setNotification(null)
+        }, 3000)
+
         setNewName("")
         setNewNumber("")
-      });
+      })
+      .catch(error => {
+        setNotifColor('error')
+        setNotification(`${person.name} has been removed from the phonebook`)
+
+        setTimeout(() => {        
+          setNotification(null)
+        }, 3000)
+
+        setPersons(persons.filter(p => p.id !== person.id))
+      })
+    }
       return false
     }
      
     const nameObject = {name: newName , number: newNumber}
     
-    personService.create(nameObject).then(newPerson =>
-      {
-        setPersons(persons.concat(newPerson))
-        setNewName("")
-        setNewNumber("")
+    personService.create(nameObject).then(newPerson => {
+      
+        setNotifColor('success')
+        setNotification(`Added ${newPerson.name}`)
+
+        setTimeout(() => {          
+          setNotification(null)
+        }, 3000)
+
+          setPersons(persons.concat(newPerson))
+          setNewName("")
+          setNewNumber("")
+        })     
         console.log('button clicked', event.target)
-      })
-  }
+    }
   
   const deletePerson = (id) => {
     const person = persons.find(p => p.id === id)
@@ -127,8 +125,10 @@ const App = () => {
     
     <div>
       <h2>Phonebook</h2>
-
-      <Filter search={search} handleSearch={handleSearch} />
+      <Notification message={notification} notificationColor={notifColor}/>
+      <div>
+      filter shown with <input value={search} onChange={handleSearch} />      
+      </div>
       <Button handleClick={() => setSearch("")} text="reset search" />
 
       <h2>Add a new person</h2>
