@@ -68,7 +68,8 @@ const App = () => {
 
       const changedNumber = {...person, number: newNumber}
 
-      return window.confirm(`Please be aware that the ${newName}'s number will be update to ${newNumber} because this already exists in the phonebook.`, personService.update(person.id, changedNumber)
+      if (window.confirm(`Please be aware that the ${newName}'s number will be update to ${newNumber} because this already exists in the phonebook.`)) 
+      personService.update(person.id, changedNumber)
       .then(returnedPerson => {
         setPersons(persons.map(p => 
           p.id !== person.id 
@@ -77,7 +78,8 @@ const App = () => {
         ))
         setNewName("")
         setNewNumber("")
-      }))
+      });
+      return false
     }
      
     const nameObject = {name: newName , number: newNumber}
@@ -94,17 +96,15 @@ const App = () => {
   const deletePerson = (id) => {
     const person = persons.find(p => p.id === id)
 
-    window.confirm(`Are you sure you want to delete ${person.name}?`, personService.remove(id)
-    .then(personService.getAll()
+    if(window.confirm(`Are you sure you want to delete ${person.name}?`))  
+    {
+      personService.remove(id)
+      .then(personService.getAll()
           .then(persons => setPersons(persons))
-          )
-    )
-  }
-  
-  const updateNumber = (id) => {
-    const person = person.find(p => p.id === id)
+          ); 
+      return false;
+    }
 
-    
   }
 
   const handleSearch = (event) => {
