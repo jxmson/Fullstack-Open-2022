@@ -13,16 +13,6 @@ const phonebookSchema = new mongoose.Schema({
 
 const Person = mongoose.model('Person', phonebookSchema)
 
-// const findAll = ()=> {
-
-//   Person.find({}).then(result => {
-//     console.log("phonebook:")
-//     result.forEach(person => {
-//         console.log(person.name, person.number)
-//     })
-//   })
-// } 
-
 mongoose.set('strictQuery',true);
 
 const person = new Person({
