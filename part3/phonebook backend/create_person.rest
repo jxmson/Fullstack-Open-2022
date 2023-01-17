@@ -1,0 +1,14 @@
+post http://localhost:3002/api/persons
+Content-Type: application/json
+
+{
+    "name": "Ntha",
+    "number": "123"
+}
+
+###
+delete http://localhost:3002/api/persons/63c652ec9a008f64cd71aa9d
+
+
+###
+get http://localhost:3002/api/persons
