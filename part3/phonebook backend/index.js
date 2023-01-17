@@ -49,10 +49,9 @@ app.get('/api/persons', (request, response) => {
   })
 
   app.get('/info', (request, response) => {
-    response.send(
-      `<p>Phonebook has info for ${persons.length} people</p>
-      ${new Date()}`
-  )
+  Person.find({}).then(persons => {
+    response.send(`<p>Phonebook has info for ${persons.length} people</p>${new Date()}`)
+  })
   })   
 
   app.get('/api/persons/:id', (request, response) => {
@@ -69,18 +68,18 @@ app.get('/api/persons', (request, response) => {
           .catch(error => next(error))
   })
 
-  const generateId = () => {
+//   const generateId = () => {
     
-    const randomId = Math.floor(Math.random() * 1000) 
-    const exists = persons.find(p => p.id !== randomId)
+//     const randomId = Math.floor(Math.random() * 1000) 
+//     const exists = persons.find(p => p.id !== randomId)
 
-    if(exists)
-    {
-        return randomId
-    }
+//     if(exists)
+//     {
+//         return randomId
+//     }
 
-    return generateId() 
-}
+//     return generateId() 
+// }
 
 app.post('/api/persons', (request, response) => {
      const body = request.body
@@ -97,12 +96,6 @@ app.post('/api/persons', (request, response) => {
         })
     }
 
-    // if(Person.find({name: {$exists:true}})){
-    //     return response.status(400).json({
-    //         error: 'name must be unique'
-    //     })
-    // }
-
     const person = new Person({
         name: body.name,
         number: body.number
@@ -113,7 +106,7 @@ app.post('/api/persons', (request, response) => {
     })    
  })
 
- app.put('/api/notes/:id', (request, response, next) => {
+ app.put('/api/persons', (request, response, next) => {
     const body = request.body
     
     const person = new Person({
@@ -121,15 +114,12 @@ app.post('/api/persons', (request, response) => {
       number: body.number
     })
 
-    if(Person.findOne({name: body.name}))
-    {
-      Person.findByIdAndUpdate(request.params.id, person, {new: true})
+      Person.updateOne({name: body.name}, {name: body.name, number: body.number}, {upsert: true})
       .then(updatedPerson => {
         response.json(updatedPerson)
       })
       .catch(error => next(error))
-    }
- })
+    })
  
  const unknownEndpoint = (request, response) => {
   response.status(404).send({ error: 'unknown endpoint' })
