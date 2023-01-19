@@ -61,8 +61,8 @@ const App = () => {
       })
       .catch(error => {
         setNotifColor('error')
-        setNotification(`${person.name} has been removed from the phonebook`)
-
+        setNotification(`error.response.data.error`)
+        
         setTimeout(() => {        
           setNotification(null)
         }, 3000)
@@ -88,7 +88,15 @@ const App = () => {
           setNewName("")
           setNewNumber("")
         })     
-        console.log('button clicked', event.target)
+        .catch(error => {
+          setNotifColor('error')
+          setNotification(error.response.data.error)
+        
+          setTimeout(() => {          
+            setNotification(null)
+          }, 3000)
+        })
+        
     }
   
   const deletePerson = (id) => {
